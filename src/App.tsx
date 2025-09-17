@@ -1,30 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { asArray, asNumber, ensureSunday, getQueryFlag, sha256Hex, toISO, uid } from "./utils/helpers";
-import { loadLocal, saveLocal, remoteLoad, remoteSave, remoteSubscribe, supaEnabled } from "./utils/storage";
+import { loadLocal, saveLocal, remoteLoad, remoteSave, remoteSubscribe, supaEnabled, ensureClientId } from "./utils/storage";
 import type { PersistShape, Session, Player, Match, MatchStats, TeamId } from "./utils/storage";
 
 const TEAM_IDS: TeamId[] = ["A","B","C"];
 const DEFAULT_PLAYERS = [
-  { name: "강민성", pos: "필드" },
-  { name: "이용범", pos: "GK" },
-  { name: "이호준", pos: "필드" },
-  { name: "최광민", pos: "필드" },
-  { name: "성은호", pos: "필드" },
-  { name: "배호성", pos: "필드" },
-  { name: "강종혁", pos: "필드" },
-  { name: "이창주", pos: "필드" },
-  { name: "주경범", pos: "필드" },
-  { name: "최우현", pos: "필드" },
-  { name: "최준형", pos: "GK" },
-  { name: "김한진", pos: "GK" },
-  { name: "장지영", pos: "필드" },
-  { name: "최준혁", pos: "필드" },
-  { name: "정민창", pos: "필드" },
-  { name: "김규연", pos: "필드" },
-  { name: "김병준", pos: "필드" },
-  { name: "윤호석", pos: "필드" },
-  { name: "이세형", pos: "필드" },
-  { name: "정제윈", pos: "필드" },
+  { name: "강민성", pos: "필드" }, { name: "이용범", pos: "GK" }, { name: "이호준", pos: "필드" }, { name: "최광민", pos: "필드" },
+  { name: "성은호", pos: "필드" }, { name: "배호성", pos: "필드" }, { name: "강종혁", pos: "필드" }, { name: "이창주", pos: "필드" },
+  { name: "주경범", pos: "필드" }, { name: "최우현", pos: "필드" }, { name: "최준형", pos: "GK" }, { name: "김한진", pos: "GK" },
+  { name: "장지영", pos: "필드" }, { name: "최준혁", pos: "필드" }, { name: "정민창", pos: "필드" }, { name: "김규연", pos: "필드" },
+  { name: "김병준", pos: "필드" }, { name: "윤호석", pos: "필드" }, { name: "이세형", pos: "필드" }, { name: "정제윈", pos: "필드" },
   { name: "한형진", pos: "필드" }
 ] as const;
 
@@ -65,6 +50,8 @@ function computeTeamBonus(st: StandingRow[]): Record<TeamId, number>{
   return out;
 }
 
+const SAVE_DEBOUNCE_MS = 200;
+
 export default function App(){
   const today = ensureSunday(toISO(new Date()));
   const fallback: PersistShape = {
@@ -87,12 +74,31 @@ export default function App(){
   const [pinInput, setPinInput] = useState('');
   const readonly = viewerFlag || !authed;
 
+  // 에코 방지용: 마지막 rev / 디바운스 타이머 / 내 clientId
+  const lastRevRef = useRef<number>(0);
+  const saveTimerRef = useRef<number | undefined>(undefined);
+  const myClientIdRef = useRef<string | null>(null);
+  useEffect(()=>{ myClientIdRef.current = ensureClientId(); }, []);
+
+  // 저장 (로컬 + 원격, 디바운스 + rev)
   useEffect(()=>{
     const state: PersistShape = { players, teamNames, sessionsByDate, sessionDate: ensureSunday(sessionDate) };
     saveLocal(state);
-    if (supaEnabled()) remoteSave(state).catch(()=>{});
-  }, [players, teamNames, sessionsByDate, sessionDate]);
 
+    // 보기전용/미인증은 원격 저장 안 함 (관리자만 저장)
+    if (readonly) return;
+
+    if (supaEnabled()) {
+      if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = window.setTimeout(async () => {
+        const nextRev = Date.now();
+        lastRevRef.current = nextRev; // 내가 방금 보낸 rev 기억
+        try { await remoteSave(state, nextRev); } catch {}
+      }, SAVE_DEBOUNCE_MS) as unknown as number;
+    }
+  }, [players, teamNames, sessionsByDate, sessionDate, readonly]);
+
+  // 로드 + 구독 (내가 보낸 이벤트는 무시)
   useEffect(()=>{
     if (!supaEnabled()) return;
     (async()=>{
@@ -101,12 +107,22 @@ export default function App(){
         setPlayers(remote.players); setTeamNames(remote.teamNames);
         setSessionDate(remote.sessionDate); setSessionsByDate(remote.sessionsByDate);
       } else {
-        await remoteSave({ players, teamNames, sessionsByDate, sessionDate });
+        // 최초엔 로컬 상태를 원격에 심을 수도 있지만, 여기선 생략
       }
     })();
-    const unsub = remoteSubscribe((p)=>{
-      setPlayers(p.players); setTeamNames(p.teamNames);
-      setSessionDate(p.sessionDate); setSessionsByDate(p.sessionsByDate);
+    const unsub = remoteSubscribe((p, meta)=>{
+      const mine = meta?.clientId && myClientIdRef.current && meta.clientId === myClientIdRef.current;
+      const stale = typeof meta?.rev === 'number' && meta.rev <= lastRevRef.current;
+      if (mine && stale) return; // 내가 보낸 최신 이하 이벤트면 무시
+
+      setPlayers(p.players);
+      setTeamNames(p.teamNames);
+      setSessionDate(p.sessionDate);
+      setSessionsByDate(p.sessionsByDate);
+
+      if (typeof meta?.rev === 'number' && meta.rev > lastRevRef.current) {
+        lastRevRef.current = meta.rev;
+      }
     });
     return ()=>unsub();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -131,12 +147,7 @@ export default function App(){
   };
   const updateTeamName = (tid: TeamId, nm: string) => { if (readonly) return; setTeamNames(prev => ({ ...prev, [tid]: nm })); };
   const toggleRoster = (tid: TeamId, pid: string) => patchSession({
-    rosters: (()=>{
-      const r = { ...cur.rosters };
-      const list = asArray(r[tid], []);
-      r[tid] = list.includes(pid) ? list.filter(id => id!==pid) : [...list, pid];
-      return r;
-    })()
+    rosters: (()=>{ const r = { ...cur.rosters }; const list = asArray(r[tid], []); r[tid] = list.includes(pid) ? list.filter(id => id!==pid) : [...list, pid]; return r; })()
   });
   const addMatch = () => patchSession({ matches: [...asArray(cur.matches, []), { id: uid(), home: "A", away: "B", hg:0, ag:0, gkHome:null, gkAway:null }] });
   const updateMatch = (id: string, patch: Partial<Match>) => patchSession({ matches: asArray(cur.matches, []).map(m=> m.id===id? { ...m, ...patch } : m ) });
@@ -264,7 +275,7 @@ export default function App(){
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin:"0 auto", padding: 16, fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, \"Noto Sans KR\", sans-serif' }}>
+    <div style={{ maxWidth: 1200, margin:"0 auto", padding: 16, fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif' }}>
       <h1 style={{ fontSize: 22, fontWeight: 800 }}>골딘 풋살 리그 · 기록/집계</h1>
 
       <div style={{ display:'flex', gap:8, alignItems:'center', flexWrap:'wrap', marginBottom:12, padding:10, border:'1px dashed #bbb', borderRadius:8, background:'#fafafa' }}>
@@ -293,6 +304,8 @@ export default function App(){
         <span style={{ color:'#888', fontSize:12 }}>일요일이 아니면 자동 보정</span>
       </div>
 
+      {/* 이하 UI는 기존과 동일 */}
+      {/* 선수 관리 */}
       <section style={box}>
         <h3>선수 관리</h3>
         <AddPlayer onAdd={addPlayer} disabled={readonly} />
@@ -310,6 +323,7 @@ export default function App(){
         </div>
       </section>
 
+      {/* 팀 구성 */}
       <section style={box}>
         <h3>팀 구성 & 팀명</h3>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:8 }}>
@@ -339,6 +353,7 @@ export default function App(){
         </div>
       </section>
 
+      {/* 경기/순위/리더보드 그대로 */}
       <section style={box}>
         <h3>경기 결과 (리그전)</h3>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
@@ -383,7 +398,7 @@ export default function App(){
           <table style={table}>
             <thead><tr><th>순위</th><th>선수</th><th>팀</th><th>G</th><th>A</th><th>CS</th><th>수비</th><th>팀</th><th>총점</th></tr></thead>
             <tbody>
-              {Object.values(sortedDaily).map((r:any, idx:number)=> (
+              {Object.values(useMemo(()=> Object.entries(calcScores(cur)).map(([pid,v]:any)=>({ id:pid, ...v })).sort((a,b)=> b.total-a.total || a.name.localeCompare(b.name,'ko')), [cur, players, teamNames])).map((r:any, idx:number)=> (
                 <tr key={r.id}>
                   <td>{idx+1}</td><td>{r.name}</td><td>{r.teamName || "-"}</td>
                   <td>{r.goals||0}</td><td>{r.assists||0}</td><td>{r.cleansheets||0}</td><td>{r.def||0}</td><td>{r.teamBonus||0}</td>
@@ -401,7 +416,26 @@ export default function App(){
           <table style={table}>
             <thead><tr><th>순위</th><th>선수</th><th>참여</th><th>G</th><th>A</th><th>CS</th><th>수비</th><th>팀</th><th>총점</th><th>평균</th></tr></thead>
             <tbody>
-              {Object.values(sortedCumulative).map((r:any, idx:number)=> (
+              {Object.values(useMemo(()=> Object.entries(
+                useMemo(()=> {
+                  const agg: Record<string, any> = {};
+                  Object.values(sessionsByDate).forEach(s => {
+                    const sc = calcScores(s);
+                    const present = new Set<string>();
+                    TEAM_IDS.forEach(t => asArray(s.rosters[t], []).forEach(pid => present.add(pid)));
+                    Object.entries(sc).forEach(([pid,v]:any)=>{
+                      const b = agg[pid] || { goals:0, assists:0, cleansheets:0, def:0, teamBonus:0, total:0, days:0, name:v.name, teamName:v.teamName };
+                      agg[pid] = { ...b,
+                        goals: b.goals+v.goals, assists: b.assists+v.assists, cleansheets: b.cleansheets+v.cleansheets,
+                        def: b.def+v.def, teamBonus: b.teamBonus+v.teamBonus, total: b.total+v.total,
+                        days: b.days + (present.has(pid)?1:0)
+                      };
+                    });
+                    present.forEach(pid => { if (!agg[pid]) agg[pid] = { goals:0, assists:0, cleansheets:0, def:0, teamBonus:0, total:0, days:1, name: "?", teamName: "" }; });
+                  });
+                  return agg;
+                }, [sessionsByDate, players, teamNames])
+              ).map(([pid,v]:any)=>({ id:pid, ...v, average: v.days>0? Math.round((v.total/v.days)*100)/100 : 0 })).sort((a,b)=> b.total-a.total || a.name.localeCompare(b.name,'ko')), [sessionsByDate, players, teamNames])).map((r:any, idx:number)=> (
                 <tr key={r.id}>
                   <td>{idx+1}</td><td>{r.name}</td><td>{r.days}</td><td>{r.goals}</td><td>{r.assists}</td><td>{r.cleansheets}</td><td>{r.def}</td><td>{r.teamBonus}</td>
                   <td style={{ fontWeight:700 }}>{r.total}</td><td>{r.average}</td>
@@ -510,5 +544,12 @@ style.innerHTML = `
   input, select, textarea, button { padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; }
   button { background: #f1f1f1; cursor: pointer; }
   button:hover { filter: brightness(0.97); }
+
+  /* 모바일에서 표 가로 스크롤 허용 (A안) */
+  @media (max-width: 600px) {
+    table { display: block; overflow-x: auto; white-space: nowrap; }
+    table th, table td { font-size: 12px; padding: 4px; }
+    input, select, button { font-size: 14px; width: auto; }
+  }
 `;
 if (typeof document!=="undefined" && !document.getElementById("goldin-style")) document.head.appendChild(style);
