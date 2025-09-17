@@ -119,7 +119,13 @@ export default function App(){
 
     <div style={{display:'flex',gap:8,alignItems:'center',margin:'8px 0 12px'}}>
       <label style={{fontWeight:600}}>날짜(일요일만):</label>
-      <input type="date" value={sessionDate} onChange={e=>changeDate(e.target.value)} disabled={readonly}/>
+      <input 
+        type="date"
+        value={sessionDate}
+        onChange={(e) => changeDate(e.target.value)}
+        // viewer 모드에서는 날짜 선택 허용
+        disabled={!authed && !viewerFlag ? true : false}
+        />
       <span style={{color:'#888',fontSize:12}}>일요일이 아니면 자동 보정</span>
     </div>
 
