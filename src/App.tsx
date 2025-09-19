@@ -304,10 +304,20 @@ export default function App() {
 
   // On any local change, persist (localStorage + cloud)
   useEffect(() => {
-    const s = { players, teamNames: globalTeamNames, sessionsByDate, sessionDate: ensureSunday(sessionDate) };
+    const s = { players, teamNames: globalTeamNames, sessionsByDate, sessionDate }; // ❌ ensureSunday 제거
     saveLocal(s);
-    if (ready) setCloud(s);
-  }, [players, globalTeamNames, sessionsByDate, sessionDate, ready]);
+    if (ready) {
+      // 같은 내용이면 setCloud 생략 → 반짝임/루프 방지
+      const same =
+        cloud &&
+        JSON.stringify(cloud.players) === JSON.stringify(players) &&
+        JSON.stringify(cloud.teamNames) === JSON.stringify(globalTeamNames) &&
+        JSON.stringify(cloud.sessionsByDate) === JSON.stringify(sessionsByDate) &&
+        cloud.sessionDate === sessionDate;
+      if (!same) setCloud(s);
+    }
+  }, [players, globalTeamNames, sessionsByDate, sessionDate, ready]); // cloud는 의존성에 넣지 말 것
+
 
   // Viewer / Admin
   const viewerFlag = getQueryFlag("viewer", "view", "readonly");
