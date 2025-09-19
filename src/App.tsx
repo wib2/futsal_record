@@ -439,10 +439,11 @@ export default function App() {
   };
   const setNotes = (txt: string) => patchSession({ notes: txt });
 
-  /* ===== 점수 계산 (GK 승수 보너스 포함) ===== */
+  /* ===== 점수 계산 (팀별 GK 보너스 규칙 반영) ===== */
   function calcScores(session: Session) {
     const out: Record<string, any> = {};
     const teamNamesUse = session.teamNames || globalTeamNames;
+
     const teamOf = (pid: string): TeamId | "-" =>
       (session.rosters.A || []).includes(pid) ? "A" :
       (session.rosters.B || []).includes(pid) ? "B" :
@@ -451,29 +452,56 @@ export default function App() {
     const standings = computeStandings(session.matches);
     const teamBonusByTeam = computeTeamBonus(standings);
 
-    // GK 승수 집계
+    // 1) GK 승수 집계 (경기 결과 기준)
     const gkWins: Record<string, number> = {}; // pid -> wins
     asArray(session.matches, []).forEach(m => {
       const hg = asNumber(m.hg, 0), ag = asNumber(m.ag, 0);
       if (hg > ag && m.gkHome) gkWins[m.gkHome] = (gkWins[m.gkHome] || 0) + 1;
       if (ag > hg && m.gkAway) gkWins[m.gkAway] = (gkWins[m.gkAway] || 0) + 1;
     });
-    // 1위(+4), 2위(+2)
-    const gkRanking = Object.entries(gkWins).sort((a, b) => b[1] - a[1] || collate(
-      players.find(p => p.id === a[0])?.name || "", players.find(p => p.id === b[0])?.name || ""
-    ));
-    const gkBonusMap: Record<string, number> = {};
-    if (gkRanking[0]) gkBonusMap[gkRanking[0][0]] = 4;
-    if (gkRanking[1]) gkBonusMap[gkRanking[1][0]] = 2;
 
-    // 개인 G/A + CS(GK) 집계
+    // 2) 팀별 GK 목록
+    const teamGKs: Record<TeamId, string[]> = { A: [], B: [], C: [] };
+    (["A","B","C"] as TeamId[]).forEach(tid => {
+      teamGKs[tid] = asArray(session.rosters[tid], [])
+        .filter(pid => players.find(p => p.id === pid)?.pos === "GK");
+    });
+
+    // 3) 팀별 GK 보너스 계산
+    //   - GK가 1명: 그 GK는 팀 보너스(4/2/1)
+    //   - GK가 2명 이상: 그 팀 GK들만 승수로 정렬해 1위+4, 2위+2 (팀 보너스 대신)
+    const gkBonusMap: Record<string, number> = {};
+    (["A","B","C"] as TeamId[]).forEach(tid => {
+      const gks = teamGKs[tid];
+      if (gks.length === 1) {
+        const onlyGK = gks[0];
+        gkBonusMap[onlyGK] = teamBonusByTeam[tid] || 0;
+      } else if (gks.length >= 2) {
+        const ranked = [...gks].sort((a, b) => {
+          const wa = gkWins[a] || 0, wb = gkWins[b] || 0;
+          if (wb !== wa) return wb - wa;
+          // 동률일 때 이름 가나다
+          const na = players.find(p => p.id === a)?.name || "";
+          const nb = players.find(p => p.id === b)?.name || "";
+          return new Intl.Collator("ko-KR", { sensitivity: "base", numeric: true }).compare(na, nb);
+        });
+        if (ranked[0]) gkBonusMap[ranked[0]] = 4;
+        if (ranked[1]) gkBonusMap[ranked[1]] = 2;
+        // 나머지 GK는 0 (명시 안 해도 기본 0)
+      }
+    });
+
+    // 4) 개인 G/A + CS(GK) 누적
     asArray(session.matches, []).forEach(m => {
       const ms = session.matchStats?.[m.id] || {};
       Object.entries(ms).forEach(([pid, s]) => {
         const base = out[pid] || { goals: 0, assists: 0, cleansheets: 0 };
-        out[pid] = { ...base, goals: base.goals + asNumber(s.goals, 0), assists: base.assists + asNumber(s.assists, 0) };
+        out[pid] = {
+          ...base,
+          goals: base.goals + asNumber((s as any).goals, 0),
+          assists: base.assists + asNumber((s as any).assists, 0)
+        };
       });
-      // CS: 실점 0이면 해당 GK +1
       if (asNumber(m.ag, 0) === 0 && m.gkHome) {
         const b = out[m.gkHome] || { goals: 0, assists: 0, cleansheets: 0 };
         out[m.gkHome] = { ...b, cleansheets: (b.cleansheets || 0) + 1 };
@@ -484,21 +512,32 @@ export default function App() {
       }
     });
 
-    // 로스터 등록된 모든 선수 최소 행 보장 + 보너스 계산
-    TEAM_IDS.forEach(tid => asArray(session.rosters[tid], []).forEach(pid => { if (!out[pid]) out[pid] = { goals: 0, assists: 0, cleansheets: 0 }; }));
+    // 5) 로스터에 있는 모든 선수 최소행 생성 + 보너스 적용
+    (["A","B","C"] as TeamId[]).forEach(tid =>
+      asArray(session.rosters[tid], []).forEach(pid => { if (!out[pid]) out[pid] = { goals: 0, assists: 0, cleansheets: 0 }; })
+    );
+
     Object.keys(out).forEach(pid => {
       const team = teamOf(pid);
       const isGK = players.find(p => p.id === pid)?.pos === "GK";
       const def = team !== "-" && (session.defAwards?.[team] || null) === pid ? 2 : 0;
-      const teamBonus = isGK ? (gkBonusMap[pid] || 0) : (team !== "-" ? (teamBonusByTeam[team] || 0) : 0); // GK는 승수보너스, 필드는 팀순위보너스
+
+      // 필드: 팀 보너스 / GK: 팀 내 규칙에 따른 gkBonusMap 사용(없으면 0)
+      const teamBonus =
+        isGK
+          ? (gkBonusMap[pid] ?? 0)
+          : (team !== "-" ? (teamBonusByTeam[team] || 0) : 0);
+
       const total = out[pid].goals + out[pid].assists + out[pid].cleansheets + def + teamBonus;
       out[pid] = {
         ...out[pid],
         def, teamBonus, total,
         name: players.find(p => p.id === pid)?.name || "?",
-        team: team, teamName: team === "-" ? "-" : (teamNamesUse as any)[team]
+        team: team,
+        teamName: team === "-" ? "-" : (teamNamesUse as any)[team]
       };
     });
+
     return out;
   }
 
