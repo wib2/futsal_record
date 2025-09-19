@@ -291,7 +291,7 @@ export default function App() {
   // Supabase realtime: cloud <-> local sync
   const initialCloud = useMemo(() => ({ players, teamNames: globalTeamNames, sessionsByDate, sessionDate }), []);
   const { value: cloud, setValue: setCloud, ready } =
-    useRealtimeJsonState<typeof initialCloud>(initialCloud, { id: "main" });
+    useRealtimeJsonState<typeof initialCloud>(initialCloud, { id: 1 });
 
   // Apply cloud state when arrives
   useEffect(() => {
