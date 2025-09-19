@@ -299,7 +299,7 @@ export default function App() {
     setPlayers(cloud.players);
     setGlobalTeamNames(cloud.teamNames);
     setSessionsByDate(cloud.sessionsByDate);
-    setSessionDate(ensureSunday(cloud.sessionDate));
+    setSessionDate(cloud.sessionDate);
   }, [cloud, ready]);
 
   // On any local change, persist (localStorage + cloud)
