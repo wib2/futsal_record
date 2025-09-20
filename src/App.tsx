@@ -105,7 +105,7 @@ function computeTeamBonus(st: ReturnType<typeof computeStandings>[number][]): Re
 }
 
 export default function App() {
-  const today = ensureSunday(toISO(new Date())));
+  const today = ensureSunday(toISO(new Date()));
   const fallback: PersistShape = {
     players: (DEFAULT_PLAYERS as any).map((p: any) => ({ id: uid(), name: p.name, active: true, pos: p.pos })),
     teamNames: { A: "팀 A", B: "팀 B", C: "팀 C" },
