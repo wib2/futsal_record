@@ -751,7 +751,7 @@ export default function App() {
 
       <div className="tabs">
         <button className={page === 1 ? "tab active" : "tab"} onClick={() => setPage(1)}>선수 관리</button>
-        <button className={page === 2 ? "tab active" : "tab"} onClick={() => setPage(2)}>일자별 기록</button>
+        <button className={page === 2 ? "tab active" : "tab"} onClick={() => setPage(2)}>일자별 경기 기록</button>
         <button className={page === 3 ? "tab active" : "tab"} onClick={() => setPage(3)}>누적 순위</button>
       </div>
 
