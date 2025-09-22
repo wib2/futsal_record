@@ -838,7 +838,7 @@ export default function App() {
         <h3>오늘의 개인 순위</h3>
         <div className="table-wrap">
           <table className="tbl"><thead><tr>
-            <th>순위</th><th>선수</th><th>팀</th><th>G</th><th>A</th><th>CS</th><th>수비</th><th>팀</th><th>총점</th>
+            <th>순위</th><th>선수</th><th>팀명</th><th>G</th><th>A</th><th>CS</th><th>수비</th><th>팀</th><th>총점</th>
           </tr></thead><tbody>
             {sortedDaily.map((r: any, idx: number) => (
               <tr key={r.id}><td>{idx + 1}</td><td>{r.name}</td><td>{r.teamName || "-"}</td><td>{r.goals || 0}</td><td>{r.assists || 0}</td><td>{r.cleansheets || 0}</td><td>{r.def || 0}</td><td>{r.teamBonus || 0}</td><td className="bold">{r.total || 0}</td></tr>
