@@ -94,7 +94,7 @@ function emptySession(): Session {
 }
 
 function normalizeLoaded(data: any): PersistShape {
-  const today = ensureSunday(toISO(new Date())));
+  const today = ensureSunday(toISO(new Date()));
   let players = asArray<any>(data?.players, []).map((p: any) => ({
     id: p?.id || uid(), name: String(p?.name || "?"), active: p?.active !== false, pos: p?.pos === "GK" ? "GK" : "필드"
   })) as Player[];
