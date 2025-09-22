@@ -787,15 +787,15 @@ export default function App() {
 
       {/* [추가] 페이지 탭: PIN 아래 위치 */}
       <div className="tabs">
-        <button className={page === 1 ? "tab active" : "tab"} onClick={() => setPage(1)}>1) 선수 관리</button>
-        <button className={page === 2 ? "tab active" : "tab"} onClick={() => setPage(2)}>2) 일자별 기록/결과/개인 순위</button>
-        <button className={page === 3 ? "tab active" : "tab"} onClick={() => setPage(3)}>3) 누적 순위</button>
+        <button className={page === 1 ? "tab active" : "tab"} onClick={() => setPage(1)}>선수 관리</button>
+        <button className={page === 2 ? "tab active" : "tab"} onClick={() => setPage(2)}>경기 기록</button>
+        <button className={page === 3 ? "tab active" : "tab"} onClick={() => setPage(3)}>누적 순위</button>
       </div>
 
       {/* [요청#2] 날짜 선택은 2번 페이지에서만 표시/적용 */}
       {page === 2 && (
         <div className="row">
-          <label className="label-strong">날짜(일요일만):</label>
+          <label className="label-strong">날짜:</label>
           <input type="date" value={ensureSunday(sessionDate)} onChange={e => setSessionDate(ensureSunday(e.target.value))} />
           <span className="hint">일요일이 아니면 같은 주 일요일로 자동 보정</span>
         </div>
@@ -830,7 +830,7 @@ export default function App() {
       {page === 2 && (
         <>
           <section className="box">
-            <h3>팀 구성 & 팀명 (이 날짜용)</h3>
+            <h3>팀 구성</h3>
             <div className="teams-grid">
               {TEAM_IDS.map(tid => {
                 const isConfirmed = Boolean(cur.rosterViewConfirmed?.[tid]);
@@ -884,7 +884,7 @@ export default function App() {
           </section>
 
           <section className="box">
-            <h3>경기 결과 (리그전)</h3>
+            <h3>경기 결과</h3>
             <div className="row spread">
               <div className="hint">승:3 / 무:1 / 패:0 · 각 경기의 <b>기록</b>에서 선수별 G/A 입력 (CS는 자동)</div>
               <button onClick={addMatch} disabled={readonly}>경기 추가</button>
@@ -899,7 +899,7 @@ export default function App() {
             </div>
 
             <div className="table-wrap">
-              <h4>순위표 (팀 보너스: 1위 4 / 2위 2 / 3위 1)</h4>
+              <h4>팀 순위</h4>
               <table className="tbl"><thead><tr>
                 <th>순위</th><th>팀</th><th>승점</th><th>승</th><th>무</th><th>패</th><th>득점</th><th>실점</th><th>득실</th><th>팀</th>
               </tr></thead><tbody>
@@ -933,7 +933,7 @@ export default function App() {
       {/* 페이지 3: 누적 순위 (모든 날짜) */}
       {page === 3 && (
         <section className="box">
-          <h3>누적 순위 (모든 날짜)</h3>
+          <h3>누적 순위</h3>
           <div className="table-wrap">
             <table className="tbl"><thead><tr>
               <th>순위</th><th>선수</th><th>참여</th><th>G</th><th>A</th><th>CS</th><th>수비</th><th>팀</th><th>총점</th><th>평균</th>
