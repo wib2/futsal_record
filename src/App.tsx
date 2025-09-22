@@ -886,7 +886,7 @@ export default function App() {
           <section className="box">
             <h3>경기 결과</h3>
             <div className="row spread">
-              <div className="hint">승:3 / 무:1 / 패:0 · 각 경기의 <b>기록</b>에서 선수별 G/A 입력 (CS는 자동)</div>
+              <div className="hint">승:3 / 무:1 / 패:0 (각 경기의 <b>기록</b>에서 선수별 G/A 입력, CS는 자동)</div>
               <button onClick={addMatch} disabled={readonly}>경기 추가</button>
             </div>
             {matchesSorted.length === 0 && <p className="muted">경기를 추가하세요.</p>}
