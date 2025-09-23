@@ -1055,8 +1055,8 @@ export default function App() {
               { key: "goals", title: "⚽ 득점왕" },
               { key: "assists", title: "🎯 도움왕" },
               { key: "def", title: "🛡 수비 기여도" },
-              { key: "teamBonus", title: "🤝 팀 기여도" }
-              { key: "cleansheets", title: "🧤 클린시트" },
+              { key: "teamBonus", title: "🤝 팀 기여도" },
+              { key: "cleansheets", title: "🧤 클린시트" }
             ].map(cat => (
               <div className="ranking-section" key={cat.key}>
                 <h4>{cat.title}</h4>
