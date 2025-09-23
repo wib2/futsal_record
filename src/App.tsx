@@ -225,7 +225,7 @@ function MatchRow({
 
   const sortRoster = (ids: string[]) => {
     const list = ids.map(id => players.find(p => p.id === id)).filter(Boolean) as Player[];
-    the const field = list.filter(p => p.pos !== "GK").sort((a, b) => collate(a.name, b.name));
+    const field = list.filter(p => p.pos !== "GK").sort((a, b) => collate(a.name, b.name));
     const gks = list.filter(p => p.pos === "GK").sort((a, b) => collate(a.name, b.name));
     return [...field, ...gks].map(p => p.id);
   };
