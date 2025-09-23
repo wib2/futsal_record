@@ -833,7 +833,7 @@ export default function App() {
       <div className="tabs">
         <button className={page === 1 ? "tab active" : "tab"} onClick={() => setPage(1)}>선수 관리</button>
         <button className={page === 2 ? "tab active" : "tab"} onClick={() => setPage(2)}>일자별 경기 기록</button>
-        <button className={page === 3 ? "tab active" : "tab"} onClick={() => setPage(3)}>누적 순위</button>
+        <button className={page === 3 ? "tab active" : "tab"} onClick={() => setPage(3)}>전체 순위</button>
         <button className={page === 4 ? "tab active" : "tab"} onClick={() => setPage(4)}>선수 분석</button>
         <button className={page === 5 ? "tab active" : "tab"} onClick={() => setPage(5)}>랭킹 보드</button>
       </div>
@@ -842,7 +842,7 @@ export default function App() {
         <div className="row">
           <label className="label-strong">날짜:</label>
           <input type="date" value={ensureSunday(sessionDate)} onChange={e => setSessionDate(ensureSunday(e.target.value))} />
-          <span className="hint">일요일이 아니면 같은 주 일요일로 자동 보정</span>
+          <span className="hint">일요일로 자동 보정</span>
         </div>
       )}
 
@@ -1034,7 +1034,7 @@ export default function App() {
 
       {page === 5 && (
         <section className="box">
-          <h3>🏆 Top 5 랭킹 보드</h3>
+          <h3>🏆 선수 랭킹 보드</h3>
 
           {/* 총점 차트 */}
           <div className="ranking-section">
@@ -1054,9 +1054,9 @@ export default function App() {
             {[
               { key: "goals", title: "⚽ 득점왕" },
               { key: "assists", title: "🎯 도움왕" },
-              { key: "def", title: "🛡 수비왕" },
-              { key: "cleansheets", title: "🧤 클린시트왕" },
+              { key: "def", title: "🛡 수비 기여도" },
               { key: "teamBonus", title: "🤝 팀 기여도" }
+              { key: "cleansheets", title: "🧤 클린시트" },
             ].map(cat => (
               <div className="ranking-section" key={cat.key}>
                 <h4>{cat.title}</h4>
