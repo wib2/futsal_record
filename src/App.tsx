@@ -928,7 +928,7 @@ export default function App() {
           <AddPlayer onAdd={(nm) => addPlayer(nm)} disabled={readonly} />
           <div className="hint">선수 명단은 모든 날짜에 공통 적용됩니다.</div>
           <div className="list-scroll players-admin-grid">
-            {activePlayersSorted.map(p => (
+            {PlayersSorted.map(p => (
               <div key={p.id} className="player-admin-item">
                 <input
                   className="player-name-input"
