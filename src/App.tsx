@@ -233,7 +233,7 @@ const FORMATION_POINTS: Record<FormationKey, { x: number; y: number; label: stri
   /* 좌우 0~100, 상단 상대 진영 */
   "1-2-1": [
     { x: 50, y: 92, label: "GK" },
-    { x: 50, y: 82, label: "DF" },
+    { x: 50, y: 90, label: "DF" },
     { x: 30, y: 58, label: "MF" }, { x: 70, y: 58, label: "MF" },
     { x: 50, y: 26, label: "FW" },
   ],
