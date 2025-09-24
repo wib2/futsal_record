@@ -14,7 +14,7 @@ import {
 /* ====== 공통 타입/유틸 ====== */
 const TEAM_IDS = ["A", "B", "C"] as const;
 type TeamId = typeof TEAM_IDS[number];
-type FormationKey = "1-2-1" | "2-2" | "3-1" | "1-2";
+type FormationKey = "1-2-1" | "2-2" | "3-1" | "1-2" | "2-2-1";
 
 type Player = { id: string; name: string; active: boolean; pos: "필드" | "GK" };
 type Match = {
@@ -258,6 +258,12 @@ const FORMATION_POINTS: Record<Exclude<FormationKey, "1-2"> | "1-2", { x: number
   "1-2": [
     { x: 50, y: 92, label: "GK" },
     { x: 30, y: 58, label: "MF" }, { x: 70, y: 58, label: "MF" },
+  ],
+   "2-2-1": [
+    { x: 50, y: 92, label: "GK" },
+    { x: 30, y: 72, label: "DF" }, { x: 70, y: 72, label: "DF" },
+    { x: 30, y: 50, label: "MF" }, { x: 70, y: 50, label: "MF" },
+    { x: 50, y: 26, label: "FW" },
   ]
 };
 
