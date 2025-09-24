@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRealtimeJsonState } from "./lib/realtimeStore";
 /* ---- Uniform SVG icon (round neck) & name helper ---- */
 const UniformIcon: React.FC<{ fill: string; size: number; stroke?: string }> = ({ fill, size, stroke = "#111" }) => (
-  <svg viewBox="0 0 100 100" width={size * 1.25} height={size} aria-hidden>
+  <svg viewBox="0 0 100 100" width={size * 1.5} height={size} aria-hidden>
     <path d="M8 26 L28 12 L42 20 L58 20 L72 12 L92 26 L84 38 L72 32 L72 90 L28 90 L28 32 L16 38 Z"
           fill={fill} stroke={stroke} strokeWidth="2" />
     <circle cx="50" cy="22" r="6" fill="#111" />
@@ -232,17 +232,15 @@ function computeTeamBonus(st: StandingRow[]): Record<TeamId, number> {
 const FORMATION_POINTS: Record<FormationKey, { x: number; y: number; label: string }[]> = {
   /* 좌우 0~100, 상단 상대 진영 */
   "1-2-1": [
-    { x: 50, y: 92, label: "GK" },
-    { x: 30, y: 58, label: "MF" }, { x: 70, y: 58, label: "MF" },
-    { x: 50, y: 26, label: "FW" },
+    { x: 50, y: 90, label: "DF" },
+    { x: 15, y: 58, label: "MF" }, { x: 55, y: 58, label: "MF" },
+    { x: 35, y: 26, label: "FW" },
   ],
   "2-2": [
-    { x: 50, y: 92, label: "GK" },
     { x: 30, y: 70, label: "DF" }, { x: 70, y: 70, label: "DF" },
     { x: 30, y: 32, label: "FW" }, { x: 70, y: 32, label: "FW" },
   ],
   "3-1": [
-    { x: 50, y: 92, label: "GK" },
     { x: 20, y: 64, label: "DF" }, { x: 50, y: 64, label: "DF" }, { x: 80, y: 64, label: "DF" },
     { x: 50, y: 28, label: "FW" },
   ],
@@ -297,7 +295,7 @@ function FormationPreview({
           const name = pid ? (players.find(p => p.id === pid)?.name || "?") : "";
           return (
             <g key={i} transform={`translate(${pt.x}, ${pt.y})`}>
-              <UniformIcon fill={jerseyFill} size={14} />
+              <UniformIcon fill={jerseyFill} size={20} />
               <text x={14 * 0.625} y={7} textAnchor="middle" dominantBaseline="middle" fontWeight={800} fontSize={7} fill="#111">{pid ? tail2(name) : "?"}</text>
             </g>
           );
@@ -307,7 +305,7 @@ function FormationPreview({
         {/* GK */}
         {gkId && (
           <g transform={`translate(${50 - (14 * 0.625)}, ${116 - (14 / 2)})`}>
-            <UniformIcon fill={jerseyFill} size={14} />
+            <UniformIcon fill={jerseyFill} size={20} />
             <text x={14 * 0.625} y={7} textAnchor="middle" dominantBaseline="middle" fontWeight={800} fontSize={7} fill="#111">
               {tail2(players.find(p => p.id === gkId)?.name || "?")}
             </text>
