@@ -2,6 +2,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRealtimeJsonState } from "./lib/realtimeStore";
 import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  LineChart, Line, CartesianGrid
+} from "recharts";
 
 // ---- Uniform SVG icon & name helper ----
 const UniformIcon: React.FC<{ fill: string; size: number; stroke?: string }> = ({ fill, size, stroke = "#111" }) => (
@@ -13,11 +17,6 @@ const UniformIcon: React.FC<{ fill: string; size: number; stroke?: string }> = (
 );
 // 이름 뒤 두 글자만
 const tail2 = (name: string) => name.slice(Math.max(0, name.length - 2));
-
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  LineChart, Line, CartesianGrid
-} from "recharts";
 
 /* ====== 공통 타입/유틸 ====== */
 const TEAM_IDS = ["A", "B", "C"] as const;
