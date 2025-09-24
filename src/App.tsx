@@ -573,7 +573,7 @@ export default function App() {
   const [globalTeamNames, setGlobalTeamNames] = useState<Record<TeamId, string>>(local0.teamNames);
   const [sessionDate, setSessionDate] = useState<string>(local0.sessionDate);
   const [sessionsByDate, setSessionsByDate] = useState<Record<string, Session>>(local0.sessionsByDate);
-  const [page, setPage] = useState<1 | 2 | 3 | 4 | 5>(5);
+  const [page, setPage] = useState<1 | 2 | 3 | 4 | 5>(2);
 
   const syncLockRef = useRef(false);
   const debTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
