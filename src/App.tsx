@@ -42,7 +42,7 @@ type Session = {
   teamNames?: Record<TeamId, string>;
   notes: string;
   rosterViewConfirmed?: Record<TeamId, boolean>;
-  formations?: Record<TeamId, FormationKey>; /* ✅ 팀별 포메이션 */
+  s?: Record<TeamId, Key>; /* ✅ 팀별 포메이션 */
 };
 type PersistShape = {
   players: Player[];
@@ -111,7 +111,7 @@ function emptySession(): Session {
     teamNames: undefined,
     notes: "",
     rosterViewConfirmed: { A: false, B: false, C: false },
-    formations: { A: "1-2-1", B: "1-2-1", C: "1-2-1" },
+    s: { A: "1-2-1", B: "1-2-1", C: "1-2-1" },
   };
 }
 
