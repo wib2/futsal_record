@@ -314,7 +314,7 @@ function FormationPreview({
           const name = pid ? (players.find(p => p.id === pid)?.name || "?") : "";
           return (
             <g key={i} transform={`translate(${pt.x}, ${pt.y})`}>
-              <UniformIcon fill={jerseyFill} size={24} />
+              <UniformIcon fill={jerseyFill} size={14} />
               <text x={7} y={7} textAnchor="middle" dominantBaseline="middle" fontWeight={800} fontSize={7 * 0.9} fill="#111">
                 {pid ? tail2(name) : "?"}
               </text>
@@ -322,8 +322,8 @@ function FormationPreview({
           );
         })}
       {includeGK && (
-  <g transform={`translate(${35}, ${110})`}>
-    <UniformIcon fill={jerseyFill} size={24} />
+  <g transform={`translate(${50}, ${130})`}>
+    <UniformIcon fill={jerseyFill} size={14} />
     <text x={7} y={7} textAnchor="middle" dominantBaseline="middle" fontWeight={800} fontSize={7 * 0.9} fill="#111">
       {tail2(players.find(p => p.id === includeGK)?.name || "?")}
     </text>
