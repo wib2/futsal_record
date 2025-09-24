@@ -277,7 +277,6 @@ function FormationPreview({
 
   /* 실제 배치할 필드 플레이어 목록 */
   const chosenFields = fields.slice(0, coordsFields.length);
-만
   const chosen = (singleGK ? [singleGK, ...fields] : fields).slice(0, useCoords.length) as string[];
 
   const jerseyFill =
