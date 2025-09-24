@@ -9,7 +9,7 @@ import { useRealtimeJsonState } from "./lib/realtimeStore";
         <circle cx="50" cy="22" r="6" fill="#111" />
       </svg>
     );
-const tail2 = (name: string) => name.slice(Math.max(0, name.length - 2));
+const tail3 = (name: string) => name.slice(Math.max(0, name.length - 3));
 
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -296,7 +296,7 @@ function FormationPreview({
         {coordsFields.map((pt, i) => {
           const pid = chosenFields[i] || null;
           const name = pid ? (players.find(p => p.id === pid)?.name || "?") : "";
-          const initialsTxt = pid ? tail2(name) : "?";
+          const initialsTxt = pid ? tail3(name) : "?";
           return (
             <g key={i} transform={`translate(${pt.x}, ${pt.y})`} textAnchor="middle">
               <UniformIcon fill={jerseyFill} size={20} stroke="var(--jersey-stroke)" />
@@ -310,7 +310,7 @@ function FormationPreview({
           <g transform={`translate(${50}, ${129})`} textAnchor="middle">
             <UniformIcon fill={jerseyFill} size={20} stroke="var(--jersey-stroke)" />
             <text className="player-initials" dominantBaseline="middle" dy="0.3em">
-              {tail2(players.find(p => p.id === singleGK)?.name || "?")}
+              {tail3(players.find(p => p.id === singleGK)?.name || "?")}
             </text>
           </g>
         )}
