@@ -1,4 +1,4 @@
-/* App.tsx — 팀별 조끼 색 포메이션 미리보기 + 랭킹 보드 개선 포함 */
+      /* App.tsx — 팀별 조끼 색 포메이션 미리보기 + 랭킹 보드 개선 포함 */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRealtimeJsonState } from "./lib/realtimeStore";
 import {
@@ -6,6 +6,14 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   LineChart, Line, CartesianGrid
 } from "recharts";
+
+const UniformIcon: React.FC<{ fill: string; size: number; stroke?: string }> = ({ fill, size, stroke = "#111" }) => (
+  <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden>
+    <path d="M10 25 L28 12 L42 20 L58 20 L72 12 L90 25 L82 38 L70 32 L70 90 L30 90 L30 32 L18 38 Z"
+          fill={fill} stroke={stroke} strokeWidth="2" />
+    <path d="M42 20 L50 34 L58 20" fill="#111" />
+  </svg>
+);
 
 /* ====== 공통 타입/유틸 ====== */
 const TEAM_IDS = ["A", "B", "C"] as const;
@@ -307,12 +315,19 @@ function FormationPreview({
           const pid = chosen[i] || null;
           const name = pid ? (players.find(p => p.id === pid)?.name || "?") : "";
           return (
-            <g key={i} transform={`translate(${pt.x}, ${pt.y})`}>
-              <g transform="scale(1.8)">
-                <path d="M -5 -6 L -1 -6 L 0 -4 L 1 -6 L 5 -6 L 5 2 L 3 2 L 3 6 L -3 6 L -3 2 L -5 2 Z" fill={jerseyFill} stroke="var(--jersey-stroke)" strokeWidth="0.4"/>
-              </g>
-              <text textAnchor="middle" dominantBaseline="central" className="player-initials">{pid ? initials(name) : "?"}</text>
-              <text y="8.5" textAnchor="middle" className="player-label">{pid ? name : "빈 자리"}</text>
+            <g transform={`translate(${x}, ${y})`}>
+              <UniformIcon fill={teamColor} size={markerSize} />
+              <text
+                x={markerSize/2}
+                y={markerSize/2 + 1}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontWeight={800}
+                fontSize={markerSize * 0.38}
+                fill="#111"
+              >
+                {tail2(player.name)}
+              </text>
             </g>
           );
         })}
