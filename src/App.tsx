@@ -1323,6 +1323,31 @@ export default function App() {
           .player-name { flex-basis: 100%; }
         }
       `}</style>
+      <button
+        onClick={() => {
+          const raw = localStorage.getItem("goldin_futsal_app_main_v17");
+          if (!raw) { alert("데이터 없음"); return; }
+          const blob = new Blob([raw], { type: "application/json" });
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "futsal_pwa_backup.json";
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }}
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          padding: "10px 15px",
+          background: "red",
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          zIndex: 9999,
+        }}
+      >
+        Export Backup
+      </button>
     </div>
   );
 }
