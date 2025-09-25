@@ -287,17 +287,17 @@ function FormationPreview({
   formation: FormationKey;
   color: "red" | "yellow" | "white";
 }) {
-  // --- Selection (FORMATION = fields only; GK separate) ---
+  // 포지션 분리
   const gkIds = roster.filter(id => (players.find(p => p.id === id)?.pos) === "GK");
   const singleGK = gkIds.length === 1 ? gkIds[0] : null;
   const fields = roster.filter(id => (players.find(p => p.id === id)?.pos) !== "GK");
 
-  // points: [0]=GK, others=field slots
+  // 기본 포인트([0]=GK, 나머지 필드)
   const pts = FORMATION_POINTS[formation];
   const baseFieldPts = pts.slice(1);
   let coordsFields = baseFieldPts;
 
-  // 5인 확장: 필드 플레이어가 5명일 때는 **무조건 2-2-1** 포메이션으로 배치
+  // ★ 5인 확장: 필드가 5명이면 무조건 2-2-1 배치
   if (fields.length >= 5) {
     coordsFields = [
       { x: 30, y: 70, label: "DF" },
@@ -307,20 +307,31 @@ function FormationPreview({
       { x: 50, y: 32, label: "FW" },
     ];
   }
-  }
+
   const chosenFields = fields.slice(0, coordsFields.length);
-
-  // When exactly 3 field players, show '용병' in the one empty slot instead of '?'
-  const showMercenary = (fields.length === 3) && (coordsFields.length >= 4);
-
 
   const jerseyFill =
     color === "red" ? "var(--jersey-red)" :
     color === "yellow" ? "var(--jersey-yellow)" : "var(--jersey-white)";
 
+  const tail3Local = (name?: string) => {
+    const t = (name || "").trim();
+    return t ? t.slice(Math.max(0, t.length - 3)) : "?";
+  };
+  const nameOf = (pid: string) => players.find(p => p.id === pid)?.name || "?";
+
+  // ★ 필드 3명일 때 빈 한 칸을 "용병" 표기
+  const showMercenary = (fields.length === 3) && (coordsFields.length >= 4);
+
+  // 사용된 ID(벤치 계산용)
+  const usedSet = new Set<string>([...chosenFields, ...(singleGK ? [singleGK] : [])]);
+
   return (
     <div className="formation-card">
-      <div className="formation-title">{teamName} <span className="subtle">({team}) · {formation}</span></div>
+      <div className="formation-title">
+        {teamName} <span className="subtle">({team}) · {formation}</span>
+      </div>
+
       <svg viewBox="0 0 100 140" className="pitch">
         <rect x="1" y="1" width="98" height="138" rx="4" className="pitch-bg" />
         <rect x="1" y="1" width="98" height="138" rx="4" className="pitch-line" fill="none" />
@@ -331,33 +342,43 @@ function FormationPreview({
 
         {coordsFields.map((pt, i) => {
           const pid = chosenFields[i] || null;
-          const name = pid ? (players.find(p => p.id === pid)?.name || "?") : "";
-          const initialsTxt = pid ? tail3(name) : (showMercenary ? "용병" : "?");
+          const displayTxt = pid ? tail3Local(nameOf(pid)) : (showMercenary ? "용병" : "?");
           return (
             <g key={i} transform={`translate(${pt.x}, ${pt.y})`} textAnchor="middle">
               <UniformIcon fill={jerseyFill} size={20} stroke="var(--jersey-stroke)" />
-              <text className="player-initials" dominantBaseline="middle" dy="0.3em">{initialsTxt}</text>
+              <text className="player-initials" dominantBaseline="middle" dy="0.3em">
+                {displayTxt}
+              </text>
             </g>
           );
         })}
 
-        {/* GK: exactly one GK shows at goal center (bottom) */}
+        {/* GK: 정확히 1명일 때만 하단 골대 중앙에 표시 */}
         {singleGK && (
           <g transform={`translate(${50}, ${129})`} textAnchor="middle">
             <UniformIcon fill={jerseyFill} size={20} stroke="var(--jersey-stroke)" />
             <text className="player-initials" dominantBaseline="middle" dy="0.3em">
-              {tail3(players.find(p => p.id === singleGK)?.name || "?")}
+              {tail3Local(nameOf(singleGK))}
             </text>
           </g>
         )}
       </svg>
 
-      {(() => { const used = new Set([...(chosenFields||[]), ...(singleGK ? [singleGK] : [])]); return roster.filter(id => !used.has(id)).length > 0; })() && (
-        <div className="bench">벤치: {(() => { const used = new Set([...(chosenFields||[]), ...(singleGK ? [singleGK] : [])]); return roster.filter(id => !used.has(id)).map(id => (players.find(p => p.id === id)?.name || "?")).join(", "); })()}</div>
+      {/* GK가 2명일 때: 벤치 대신 GK: 목록으로 표기 */}
+      {gkIds.length === 2 ? (
+        <div className="bench">GK: {gkIds.map((id) => nameOf(id)).join(", ")}</div>
+      ) : (
+        (() => {
+          const benchNames = roster.filter((id) => !usedSet.has(id)).map(nameOf);
+          return benchNames.length > 0 ? (
+            <div className="bench">벤치: {benchNames.join(", ")}</div>
+          ) : null;
+        })()
       )}
     </div>
   );
 }
+
 
 /* ====== MatchRow (기존) ====== */
 function MatchRow({
