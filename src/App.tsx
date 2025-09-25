@@ -258,13 +258,13 @@ const FORMATION_POINTS: Record<FormationKey, { x: number; y: number; label: stri
   ],
   "2-2": [
     { x: 50, y: 92, label: "GK" },
-    { x: 30, y: 70, label: "DF" }, { x: 70, y: 70, label: "DF" },
-    { x: 30, y: 32, label: "FW" }, { x: 70, y: 32, label: "FW" },
+    { x: 30, y: 90, label: "DF" }, { x: 70, y: 90, label: "DF" },
+    { x: 30, y: 35, label: "FW" }, { x: 70, y: 35, label: "FW" },
   ],
   "3-1": [
     { x: 50, y: 92, label: "GK" },
     { x: 20, y: 64, label: "DF" }, { x: 50, y: 64, label: "DF" }, { x: 80, y: 64, label: "DF" },
-    { x: 50, y: 28, label: "FW" },
+    { x: 50, y: 35, label: "FW" },
   ],
 };
 
@@ -300,11 +300,11 @@ function FormationPreview({
   // ★ 5인 확장: 필드가 5명이면 무조건 2-2-1 배치
   if (fields.length >= 5) {
     coordsFields = [
-      { x: 30, y: 70, label: "DF" },
-      { x: 70, y: 70, label: "DF" },
-      { x: 35, y: 50, label: "MF" },
-      { x: 65, y: 50, label: "MF" },
-      { x: 50, y: 32, label: "FW" },
+      { x: 30, y: 90, label: "DF" },
+      { x: 70, y: 90, label: "DF" },
+      { x: 30, y: 50, label: "MF" },
+      { x: 70, y: 50, label: "MF" },
+      { x: 50, y: 35, label: "FW" },
     ];
   }
 
