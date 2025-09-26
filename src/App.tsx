@@ -309,9 +309,9 @@ const FORMATION_POINTS: Record<FormationKey, { x: number; y: number; label: stri
   /* 좌우 0~100, 상단 상대 진영 */
   "1-2-1": [
     { x: 50, y: 92, label: "GK" },
-    { x: 50, y: 90, label: "DF" },
-    { x: 30, y: 58, label: "MF" }, { x: 70, y: 58, label: "MF" },
-    { x: 50, y: 26, label: "FW" },
+    { x: 50, y: 92, label: "DF" },
+    { x: 30, y: 70, label: "MF" }, { x: 70, y: 70, label: "MF" },
+    { x: 50, y: 48, label: "FW" },
   ],
   "2-2": [
     { x: 50, y: 92, label: "GK" },
@@ -325,9 +325,9 @@ const FORMATION_POINTS: Record<FormationKey, { x: number; y: number; label: stri
   ],
   "2-2-1": [
   { x: 50, y: 92, label: "GK" },
-  { x: 30, y: 70, label: "DF" }, { x: 70, y: 70, label: "DF" },
-  { x: 30, y: 45, label: "MF" }, { x: 70, y: 45, label: "MF" },
-  { x: 50, y: 22, label: "FW" },
+  { x: 30, y: 92, label: "DF" }, { x: 70, y: 92, label: "DF" },
+  { x: 30, y: 70, label: "MF" }, { x: 70, y: 70, label: "MF" },
+  { x: 50, y: 48, label: "FW" },
 ]};
 
 function initials(name: string) {
@@ -631,7 +631,7 @@ useEffect(() => { (async () => {
     }
   } catch {}
 })(); }, []);
-const [page, setPage] = useState<1 | 2 | 3 | 4 | 5>(5);
+const [page, setPage] = useState<1 | 2 | 3 | 4 | 5>(2);
 
   const syncLockRef = useRef(false);
   const debTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
