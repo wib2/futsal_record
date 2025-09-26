@@ -309,25 +309,25 @@ const FORMATION_POINTS: Record<FormationKey, { x: number; y: number; label: stri
   /* 좌우 0~100, 상단 상대 진영 */
   "1-2-1": [
     { x: 50, y: 92, label: "GK" },
-    { x: 50, y: 92, label: "DF" },
+    { x: 50, y: 100, label: "DF" },
     { x: 30, y: 70, label: "MF" }, { x: 70, y: 70, label: "MF" },
-    { x: 50, y: 48, label: "FW" },
+    { x: 50, y: 40, label: "FW" },
   ],
   "2-2": [
     { x: 50, y: 92, label: "GK" },
-    { x: 30, y: 70, label: "DF" }, { x: 70, y: 70, label: "DF" },
-    { x: 30, y: 32, label: "FW" }, { x: 70, y: 32, label: "FW" },
+    { x: 30, y: 90, label: "DF" }, { x: 70, y: 90, label: "DF" },
+    { x: 30, y: 50, label: "FW" }, { x: 70, y: 50, label: "FW" },
   ],
   "3-1": [
     { x: 50, y: 92, label: "GK" },
-    { x: 20, y: 64, label: "DF" }, { x: 50, y: 64, label: "DF" }, { x: 80, y: 64, label: "DF" },
-    { x: 50, y: 28, label: "FW" },
+    { x: 20, y: 90, label: "DF" }, { x: 50, y: 90, label: "DF" }, { x: 80, y: 90, label: "DF" },
+    { x: 50, y: 50, label: "FW" },
   ],
   "2-2-1": [
   { x: 50, y: 92, label: "GK" },
-  { x: 30, y: 92, label: "DF" }, { x: 70, y: 92, label: "DF" },
+  { x: 30, y: 100, label: "DF" }, { x: 70, y: 100, label: "DF" },
   { x: 30, y: 70, label: "MF" }, { x: 70, y: 70, label: "MF" },
-  { x: 50, y: 48, label: "FW" },
+  { x: 50, y: 40, label: "FW" },
 ]};
 
 function initials(name: string) {
