@@ -72,7 +72,7 @@ const layout = {
   flag:   { x: 88, y: 250, size: 56 },
   crest:  { x: 88, y: 314, size: 56 },
   rating: { x: 86, y: 140 },
-  pos:    { x: 86, y: 185 },
+  pos:    { x: 86, y: 210 },
   nameY:  560,
   statLx: 110,
   statRx: 340,
@@ -130,8 +130,8 @@ export const FifaCard = forwardRef<SVGSVGElement, Props>(function FifaCard({ sta
       </g>
 
       {/* Rating & Position */}
-      <text x={layout.rating.x} y={layout.rating.y} fontFamily={fonts.rating} fontSize="120" fontWeight="800" fill={theme.text}>{s.ovr ?? 0}</text>
-      <text x={layout.pos.x} y={layout.pos.y} fontFamily={fonts.rating} fontSize="68" fontWeight="700" fill={theme.text}>{s.pos || ""}</text>
+      <text x={layout.rating.x} y={layout.rating.y} fontFamily={fonts.rating} fontSize="105" fontWeight="800" fill={theme.text}>{s.ovr ?? 0}</text>
+      <text x={layout.pos.x} y={layout.pos.y} fontFamily={fonts.rating} fontSize="62" fontWeight="700" fill={theme.text}>{s.pos || ""}</text>
 
       {/* Flag & Crest */}
       {s.nationFlag ? (
