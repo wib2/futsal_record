@@ -176,7 +176,7 @@ export default function FifaSection({ players, readonly }: Props) {
         }
       `}</style>
 
-      <h3>피파 카드</h3>
+      <h3>선수 카드</h3>
       <div className="row" style={{ gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <label>선수 선택</label>
         <select value={pid} onChange={(e)=>setPid(e.target.value)} disabled={readonly || loading}>
