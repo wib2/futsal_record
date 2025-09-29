@@ -1,4 +1,4 @@
-
+    
 import React, { useEffect, useRef, useState } from "react";
 import { FifaCard, FifaStats, downloadSvgAsPng } from "./FifaCard";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
@@ -168,7 +168,19 @@ export default function FifaSection({ players, readonly }: Props) {
   }
 
   return (
+    
     <section className="box">
+      /* 모바일 대응용 CSS — 레이아웃만 조정 */
+      <style>{`
+        .fifa-flex { display:flex; align-items:flex-start; gap:24px; flex-wrap:wrap; }
+        .fifa-card-col { flex: 1 1 280px; min-width: 260px; max-width: 420px; }
+        .fifa-form-grid { display:grid; grid-template-columns: 120px 1fr; gap: 8px 12px; flex: 1 1 260px; min-width: 260px; }
+        @media (max-width: 520px) {
+          .fifa-form-grid { grid-template-columns: 1fr; } /* 라벨/입력 한 줄씩 세로 스택 */
+          .fifa-form-grid label { margin-top: 10px; }
+        }
+      `}</style>
+
       <h3>피파 카드</h3>
       <div className="row" style={{ gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <label>선수 선택</label>
@@ -179,12 +191,12 @@ export default function FifaSection({ players, readonly }: Props) {
         <button onClick={download}>PNG로 저장</button>
       </div>
 
-      <div className="row" style={{ gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
-        <div style={{ flex: "0 0 320px" }}>
-          <FifaCard ref={svgRef} stats={form} />
+      <div className="fifa-flex">
+        <div className="fifa-card-col">
+          <FifaCard ... />
         </div>
 
-        <div className="grid" style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: "8px 12px", minWidth: 260 }}>
+        <div className="fifa-form-grid">
           <label>이름</label><input value={form.name} onChange={e=>set("name", e.target.value)} disabled={readonly}/>
           <label>포지션</label><input value={form.pos} onChange={e=>set("pos", e.target.value)} disabled={readonly}/>
           <label>OVR</label><input type="number" value={form.ovr} readOnly />
