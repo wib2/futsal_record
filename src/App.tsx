@@ -1104,7 +1104,7 @@ useEffect(() => {
             ))}
           </div>
           <div className="box" style={{ marginTop: 16 }}>
-            <h4>피파 카드 입력</h4>
+            <h4>선수 스탯 입력</h4>
             <FifaSection
               players={playersSorted.map(p => ({ id: p.id, name: p.name }))}
             />
