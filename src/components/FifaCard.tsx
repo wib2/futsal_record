@@ -109,7 +109,7 @@ export const FifaCard = forwardRef<SVGSVGElement, Props>(function FifaCard({ sta
       role="img"
       width="100%"
       preserveAspectRatio="xMidYMid meet"
-      style={{ display: 'block', height: 'auto', maxWidth: '420px' }}  // <- responsive, cap at 420px
+      style={{ display: 'block', height: 'auto', maxWidth: '340px' }}  // <- responsive, cap at 420px
     >
       <defs>
         <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
