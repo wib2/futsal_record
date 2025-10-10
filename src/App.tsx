@@ -353,8 +353,8 @@ const FORMATION_POINTS: Record<FormationKey, { x: number; y: number; label: stri
   ],
     "2-2-2": [
     { x: 50, y: 92, label: "GK" },
-    { x: 25, y: 90, label: "DF" }, { x: 75, y: 90, label: "DF" },
-    { x: 30, y: 65, label: "MF" }, { x: 70, y: 65, label: "MF" },
+    { x: 30, y: 100, label: "DF" }, { x: 70, y: 100, label: "DF" },
+    { x: 30, y: 70, label: "MF" }, { x: 70, y: 70, label: "MF" },
     { x: 30, y: 40, label: "FW" }, { x: 70, y: 40, label: "FW" },
   ],
 "2-2-1": [
