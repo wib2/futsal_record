@@ -846,7 +846,7 @@ useEffect(() => {
           return gkIds.length === 1 ? gkIds[0] : null;
         };
 
-        if (opts?.reevalGK && teamChangedHome) {
+        if (opts?.reevalGK && teamChangedHome && nextGKHome !== "") {
           const auto = pickOneGK(nextHome);
           const rosterHome = asArray(cur.rosters[nextHome], []);
           const isCurrentValid = nextGKHome ? rosterHome.includes(nextGKHome) && (players.find(p => p.id === nextGKHome)?.pos === "GK") : false;
@@ -854,7 +854,7 @@ useEffect(() => {
           else if (!isCurrentValid) nextGKHome = null;
         }
 
-        if (opts?.reevalGK && teamChangedAway) {
+        if (opts?.reevalGK && teamChangedAway && nextGKAway !== "") {
           const auto = pickOneGK(nextAway);
           const rosterAway = asArray(cur.rosters[nextAway], []);
           const isCurrentValid = nextGKAway ? rosterAway.includes(nextGKAway) && (players.find(p => p.id === nextGKAway)?.pos === "GK") : false;
